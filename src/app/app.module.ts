@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
+import { LoggingModule } from 'src/logging/logging.module';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { UsersModule } from 'src/users/users.module';
       dbName: process.env.MONGODB_DB_NAME,
     }),
     UsersModule,
+    LoggingModule,
   ],
   exports: [MongooseModule],
 })

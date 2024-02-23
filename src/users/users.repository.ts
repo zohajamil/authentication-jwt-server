@@ -21,7 +21,7 @@ export class UsersRepository {
         email: createUserDto.email,
         password: createUserDto.password,
       });
-      return createdUser;
+      return createdUser.toObject();
     } catch (error) {
       Logger.error('user.repository', 'signUp', error.message, error.stack, '');
       throw new InternalServerErrorException(error.message);

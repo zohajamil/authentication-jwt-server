@@ -12,6 +12,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UserSchema } from './entities/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { VerifyTokenMiddleware } from 'src/middleware/verify-token/verify-token.middleware';
+import { LoggingModule } from 'src/logging/logging.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { VerifyTokenMiddleware } from 'src/middleware/verify-token/verify-token.
       signOptions: { expiresIn: '30s' },
     }),
     HttpModule,
+    LoggingModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],
