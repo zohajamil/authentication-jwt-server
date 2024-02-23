@@ -11,10 +11,14 @@ import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import { AuthenticateUserRequestDto } from './dto/req/authenticate-user.req.dto';
 import { User } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UsersRepository) {}
+  constructor(
+    private readonly userRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signUp(
     createUserDto: CreateUserRequestDto,
@@ -31,7 +35,15 @@ export class UsersService {
           ...createUserDto,
           password: passwordHash,
         });
-        return user;
+
+        const jwtToken = await this.jwtService.signAsync(
+          { user },
+          {
+            secret: process.env.JWT_KEY,
+          },
+        );
+
+        return { ...user, accessToken: jwtToken };
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -47,12 +59,34 @@ export class UsersService {
         authenticateUserDto.password,
         user,
       );
-      if (passwordValidated) return { ...user, accessToken: 'dfghj' };
-      else throw new NotFoundException('Wrong email or password');
+      if (passwordValidated) {
+        const jwtToken = await this.jwtService.signAsync(
+          { user },
+          {
+            secret: process.env.JWT_KEY,
+          },
+        );
+        return { ...user, accessToken: jwtToken };
+      } else {
+        throw new NotFoundException('Wrong email or password');
+      }
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  // async getUser(email: string): Promise<User> {
+  //   try {
+  //     const user = await this.userRepository.getUser(email);
+  //     if (user) {
+  //       return user;
+  //     } else {
+  //       throw new NotFoundException('User does not exist!');
+  //     }
+  //   } catch (error) {
+  //     throw new InternalServerErrorException(error.message);
+  //   }
+  // }
 
   async validateUserPassword(
     enteredPassword: string,

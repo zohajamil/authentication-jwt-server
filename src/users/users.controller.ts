@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { AuthenticateUserRequestDto } from './dto/req/authenticate-user.req.dto';
 import { AuthenticatedUserResponseDto } from './dto/res/authenticated-user.res.dto';
 import { CreateUserRequestDto } from './dto/req/create-user.req.dto';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -38,6 +39,15 @@ export class UsersController {
     try {
       const data = await this.usersService.authenticate(authenticateUserDto);
       return response.status(HttpStatus.OK).send(data);
+    } catch (error) {
+      throw new HttpException(error.response, error.status);
+    }
+  }
+
+  @Get()
+  async getUser(@Res() response): Promise<User> {
+    try {
+      return response.status(HttpStatus.OK).send(response.locals.user);
     } catch (error) {
       throw new HttpException(error.response, error.status);
     }

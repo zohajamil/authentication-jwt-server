@@ -3,7 +3,6 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { AuthenticatedUserResponseDto } from './dto/res/authenticated-user.res.dto';
 import { User } from './entities/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -13,9 +12,7 @@ import { CreateUserRequestDto } from './dto/req/create-user.req.dto';
 export class UsersRepository {
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
-  async signUp(
-    createUserDto: CreateUserRequestDto,
-  ): Promise<AuthenticatedUserResponseDto> {
+  async signUp(createUserDto: CreateUserRequestDto): Promise<User> {
     try {
       Logger.log('Creating new user');
       const createdUser = await this.userModel.create({
@@ -24,10 +21,7 @@ export class UsersRepository {
         email: createUserDto.email,
         password: createUserDto.password,
       });
-      return {
-        ...createdUser,
-        accessToken: 'dfgtyhuj',
-      };
+      return createdUser;
     } catch (error) {
       Logger.error('user.repository', 'signUp', error.message, error.stack, '');
       throw new InternalServerErrorException(error.message);
